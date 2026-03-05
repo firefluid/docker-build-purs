@@ -1,0 +1,54 @@
+From 8160f6e77ac3ce3f32f71077aca2418a7acbfa7c Mon Sep 17 00:00:00 2001
+From: Dimitri <30989132+firefluid@users.noreply.github.com>
+Date: Tue, 16 Sep 2025 11:05:51 +0000
+Subject: [PATCH] Fix compilation issues
+
+---
+ src/Spago/Version.hs | 10 +++++-----
+ src/Spago/Watch.hs   |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/Spago/Version.hs b/src/Spago/Version.hs
+index fc3d60e..1e9eb45 100644
+--- a/src/Spago/Version.hs
++++ b/src/Spago/Version.hs
+@@ -60,8 +60,8 @@ getCurrentVersion = do
+ 
+   case Safe.maximumMay tags of
+     Nothing -> do
+-      logInfo $ display $ "No git version tags found, so assuming current version is " <> unparseVersion mempty
+-      pure mempty
++      logInfo $ display $ "No git version tags found, so assuming current version is " <> unparseVersion (SemVer 0 0 0 Nothing mempty)
++      pure (SemVer 0 0 0 Nothing mempty)
+     Just maxVersion -> do
+       logInfo $ display $ "Found current version from git tag: " <> unparseVersion maxVersion
+       pure maxVersion
+@@ -70,9 +70,9 @@ getCurrentVersion = do
+ getNextVersion :: VersionBump -> SemVer -> Either Text SemVer
+ getNextVersion spec currentV@SemVer{..} =
+   case spec of
+-    Major -> Right $ SemVer (_svMajor + 1) 0 0 [] mempty
+-    Minor -> Right $ SemVer _svMajor (_svMinor + 1) 0 [] mempty
+-    Patch -> Right $ SemVer _svMajor _svMinor (_svPatch + 1) [] mempty
++    Major -> Right $ SemVer (_svMajor + 1) 0 0 Nothing mempty
++    Minor -> Right $ SemVer _svMajor (_svMinor + 1) 0 Nothing mempty
++    Patch -> Right $ SemVer _svMajor _svMinor (_svPatch + 1) Nothing mempty
+     Exact newV
+       | currentV < newV -> Right newV
+       | otherwise -> do
+diff --git a/src/Spago/Watch.hs b/src/Spago/Watch.hs
+index aba6fbd..6aa7c9f 100644
+--- a/src/Spago/Watch.hs
++++ b/src/Spago/Watch.hs
+@@ -30,7 +30,7 @@ watch
+   => Set.Set Glob.Pattern -> ClearScreen -> AllowIgnored -> RIO env ()
+   -> RIO env ()
+ watch globs shouldClear allowIgnored action = do
+-  let config = Watch.defaultConfig { Watch.confDebounce = Watch.NoDebounce }
++  let config = Watch.defaultConfig
+   fileWatchConf config shouldClear allowIgnored $ \getGlobs -> do
+     getGlobs globs
+     action
+-- 
+2.36.6
+
