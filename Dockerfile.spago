@@ -1,7 +1,4 @@
-FROM benz0li/ghc-musl:9.2.4 AS build
-
-# Update package list and upgrade. This might not be neccessary
-RUN apk update && apk upgrade
+FROM docker.io/benz0li/ghc-musl:9.2.4 AS build
 
 # Clone spago repository and checkout 0.21.0 tag
 RUN git clone -b 0.21.0 https://github.com/purescript/spago.git
